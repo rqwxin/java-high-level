@@ -26,6 +26,7 @@ public class ProduerDemon {
 						for (int i = 0; i < 10; i++) {
 							Message message = new Message("order", "tag", ("订单"+System.currentTimeMillis()).getBytes());
 							SendResult result = producer.send(message);
+							result.getSendStatus();
 							System.out.println(result);
 							Thread.sleep(100);
 						}
