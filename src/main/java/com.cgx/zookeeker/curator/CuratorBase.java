@@ -5,6 +5,8 @@ import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.CuratorFrameworkFactory;
 import org.apache.curator.framework.api.BackgroundCallback;
 import org.apache.curator.framework.api.CuratorEvent;
+import org.apache.curator.framework.recipes.leader.LeaderLatch;
+import org.apache.curator.framework.recipes.leader.LeaderLatchListener;
 import org.apache.curator.retry.ExponentialBackoffRetry;
 import org.apache.zookeeper.CreateMode;
 import org.apache.zookeeper.data.Stat;
@@ -127,6 +129,26 @@ public class CuratorBase {
 		}
 	}
 
+	static  void getLeader(){
+        LeaderLatch leaderLatch = new LeaderLatch(cf, "/super/leader", "Client #" +8);
+        leaderLatch.addListener(new LeaderLatchListener() {
+            @Override
+            public void isLeader() {
+                System.out.println( "======ZOOKEEPER CURATOR  I am leader. I am dojob! id = "+leaderLatch.getId());
+
+            }
+            @Override
+            public void notLeader() {
+                System.out.println("===========I am not leader. I will do nothing!  id="+leaderLatch.getId());
+            }
+        });
+        try {
+            leaderLatch.start();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
 	public static void main(String[] args) throws Exception {
 		//创建CuratorFramework
 	   connZk();
@@ -144,6 +166,7 @@ public class CuratorBase {
 		//删除
 		delNode();
 
+        getLeader();
 
 		
 		// 读取子节点getChildren方法 和 判断节点是否存在checkExists方法
